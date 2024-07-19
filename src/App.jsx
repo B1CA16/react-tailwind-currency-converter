@@ -1,34 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import InputAmount from "./components/InputAmount"
+import SelectCountry from "./components/SelectCountry"
+import SwitchCurrency from "./components/SwitchCurrency"
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="mx-8">
+      <div className="flex flex-col max-w-3xl shadow-xl dark:shadow-neutral-950 bg-neutral-100/20 dark:bg-neutral-800/20 rounded-lg mx-auto p-8 mt-48">
+        <h2 className="text-4xl font-bold mb-10 text-center leading-snug text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500">Currency Converter</h2>
+        <div className="flex md:flex-row flex-col gap-8 md:gap-0 justify-between items-center">
+          <InputAmount />
+          <div className="flex gap-8">
+            <SelectCountry from={true} />
+            <SwitchCurrency />
+            <SelectCountry />
+          </div>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
+    
   )
 }
 
