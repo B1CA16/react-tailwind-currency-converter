@@ -1,34 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaAngleDown } from 'react-icons/fa';
+import axios from 'axios';
 import useAxios from '../hooks/useAxios';
 
-const SelectCountry = ({ label }) => {
-  const [inputValue, setInputValue] = useState('');
-  const [selectedValue, setSelectedValue] = useState('');
+const SelectCountry = ({ label, value, setValue }) => {
+  const [inputValue, setInputValue] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
+  const [supportedCurrencies, setSupportedCurrencies] = useState([]);
 
-  const [data, loaded, error] = useAxios("https://restcountries.com/v3.1/all")
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
 
-  if(loaded) {
+  // Fetch supported currencies from freecurrencyapi.com
+  useEffect(() => {
+    const fetchSupportedCurrencies = async () => {
+      try {
+        const response = await axios.get('https://api.freecurrencyapi.com/v1/currencies', {
+          params: {
+            apikey: 'fca_live_No7y60zeWcxOeNT9w4AFSZ2XxaGxOb337jHwQolR'
+          }
+        });
+        setSupportedCurrencies(Object.keys(response.data.data));
+      } catch (error) {
+        console.error("Error fetching supported currencies:", error);
+      }
+    };
+
+    fetchSupportedCurrencies();
+  }, []);
+
+  const [data, loaded, error] = useAxios("https://restcountries.com/v3.1/all");
+
+  if (loaded) {
     return (
       <div className="relative">
-      <input
-        type="text"
-        className='outline-none max-w-36 dark:bg-neutral-700 bg-white p-3 pr-7 rounded-lg dark:text-neutral-200 text-neutral-900 border dark:border-neutral-700 border-neutral-300 w-full'
-        readonly
-        disabled
-      />
-    </div>
-    )
+        <input
+          type="text"
+          className='outline-none max-w-36 dark:bg-neutral-700 bg-white p-3 pr-7 rounded-lg dark:text-neutral-200 text-neutral-900 border dark:border-neutral-700 border-neutral-300 w-full'
+          readOnly
+          disabled
+          value="Loading..."
+        />
+      </div>
+    );
   }
 
-  if(error) {
-    return "Something went wrong"
+  if (error) {
+    return "Something went wrong";
   }
-  const dataFilter = data.filter(item => "currencies" in item)
+
+  const dataFilter = data.filter(item => "currencies" in item);
   const dataCountries = dataFilter.map(item => {
-    return `${item.flag} ${Object.keys(item.currencies)[0]} - ${item.name.common}`
-  })
+    const currencyCode = Object.keys(item.currencies)[0];
+    if (supportedCurrencies.includes(currencyCode)) {
+      return `${item.flag} ${currencyCode} - ${item.name.common}`;
+    }
+    return null;
+  }).filter(item => item !== null);
 
   const filteredOptions = dataCountries.filter(option =>
     option.toLowerCase().includes(inputValue.toLowerCase())
@@ -40,8 +69,7 @@ const SelectCountry = ({ label }) => {
   };
 
   const handleOptionClick = (option) => {
-    setSelectedValue(option);
-    setInputValue(option);
+    setValue(option);
     setIsOpen(false);
   };
 
@@ -51,7 +79,7 @@ const SelectCountry = ({ label }) => {
         type="text"
         value={inputValue}
         onChange={handleInputChange}
-        className='outline-none max-w-36 dark:bg-neutral-900 bg-white p-3 pr-7 rounded-lg dark:text-neutral-200 text-neutral-900 border dark:border-neutral-700 border-neutral-300 w-full'
+        className='outline-none max-w-52 dark:bg-neutral-900 bg-white p-3 pr-7 rounded-lg dark:text-neutral-200 text-neutral-900 border dark:border-neutral-700 border-neutral-300 w-full'
         placeholder={label}
         onFocus={() => setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
