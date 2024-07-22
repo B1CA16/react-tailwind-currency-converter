@@ -1,13 +1,36 @@
 import React, { useState } from 'react';
 import { FaAngleDown } from 'react-icons/fa';
+import useAxios from '../hooks/useAxios';
 
-const SelectCountry = ({ from }) => {
+const SelectCountry = ({ label }) => {
   const [inputValue, setInputValue] = useState('');
   const [selectedValue, setSelectedValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const options = ["Salad", "Rolls", "Desert", "Sandwich", "Cake", "Pure Veg", "Pasta", "Noodles"];
 
-  const filteredOptions = options.filter(option =>
+  const [data, loaded, error] = useAxios("https://restcountries.com/v3.1/all")
+
+  if(loaded) {
+    return (
+      <div className="relative">
+      <input
+        type="text"
+        className='outline-none max-w-36 dark:bg-neutral-700 bg-white p-3 pr-7 rounded-lg dark:text-neutral-200 text-neutral-900 border dark:border-neutral-700 border-neutral-300 w-full'
+        readonly
+        disabled
+      />
+    </div>
+    )
+  }
+
+  if(error) {
+    return "Something went wrong"
+  }
+  const dataFilter = data.filter(item => "currencies" in item)
+  const dataCountries = dataFilter.map(item => {
+    return `${item.flag} ${Object.keys(item.currencies)[0]} - ${item.name.common}`
+  })
+
+  const filteredOptions = dataCountries.filter(option =>
     option.toLowerCase().includes(inputValue.toLowerCase())
   );
 
@@ -29,7 +52,7 @@ const SelectCountry = ({ from }) => {
         value={inputValue}
         onChange={handleInputChange}
         className='outline-none max-w-36 dark:bg-neutral-900 bg-white p-3 pr-7 rounded-lg dark:text-neutral-200 text-neutral-900 border dark:border-neutral-700 border-neutral-300 w-full'
-        placeholder={from ? "From" : "To"}
+        placeholder={label}
         onFocus={() => setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
       />

@@ -1,8 +1,11 @@
+import { useState } from "react";
 import InputAmount from "./components/InputAmount"
 import SelectCountry from "./components/SelectCountry"
 import SwitchCurrency from "./components/SwitchCurrency"
 
 function App() {
+  const [fromCurrency, setFromCurrency] = useState('');
+  const [toCurrency, setToCurrency] = useState('');
 
   return (
     <div className="mx-8">
@@ -11,9 +14,9 @@ function App() {
         <div className="flex md:flex-row flex-col gap-8 md:gap-0 justify-between items-center">
           <InputAmount />
           <div className="flex gap-8">
-            <SelectCountry from={true} />
+            <SelectCountry label={"From"} from={fromCurrency} setValue={setFromCurrency} />
             <SwitchCurrency />
-            <SelectCountry />
+            <SelectCountry label={"To"} to={toCurrency} setValue={setToCurrency} />
           </div>
         </div>
       </div>
